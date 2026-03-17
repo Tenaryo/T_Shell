@@ -6,6 +6,8 @@ int main() {
   std::cout << std::unitbuf;
   std::cerr << std::unitbuf;
 
-  // TODO: Uncomment the code below to pass the first stage
   std::cout << "$ ";
+  std::string usrInput;
+  std::cin >> usrInput;
+  std::cerr << "{" << usrInput << "}: command not found\n";
 }
