@@ -2,16 +2,30 @@
 #include <string>
 #include <string_view>
 
-void handle_not_found(std::string_view usrInput) {
-  std::cerr << usrInput << ": command not found\n";
+void cmd_echo() {
+  std::string s;
+  std::getline(std::cin, s);
+  std::cout << s << '\n';
 }
 
-bool handle_input() {
-  std::string usrInput;
-  std::cin >> usrInput;
-  if (usrInput == "exit") return true;
-  handle_not_found(usrInput);
-  return false;
+void cmd_exit() {
+  exit(0);
+}
+
+void handle_not_found(std::string_view command) {
+  std::cerr << command << ": command not found\n";
+}
+
+void handle_input() {
+  std::unordered_map<std::string, std::function<void()>> commands {
+    { "echo", cmd_echo },
+    { "exit", cmd_exit }
+  }
+  std::string command;
+  std::cin >> command;
+
+  if (commands.count(command)) commands[command]();
+  else handle_not_found(command);
 }
 
 int main() {
@@ -20,7 +34,7 @@ int main() {
 
   while (true) {
     std::cout << "$ ";
-    if (handle_input()) break;
+    handle_input();
   }
 
   return 0;
