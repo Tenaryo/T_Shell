@@ -1,6 +1,8 @@
 #include <iostream>
 #include <string>
 #include <string_view>
+#include <unordered_map>
+#include <functional>
 
 void cmd_echo() {
   std::string s;
