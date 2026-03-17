@@ -9,5 +9,5 @@ int main() {
   std::cout << "$ ";
   std::string usrInput;
   std::cin >> usrInput;
-  std::cerr << "{" << usrInput << "}: command not found\n";
+  std::cerr << usrInput << ": command not found\n";
 }
