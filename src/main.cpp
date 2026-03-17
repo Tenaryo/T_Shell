@@ -6,19 +6,22 @@ void handle_not_found(std::string_view usrInput) {
   std::cerr << usrInput << ": command not found\n";
 }
 
-void handle_input() {
+bool handle_input() {
   std::string usrInput;
   std::cin >> usrInput;
+  if (usrInput == "exit") return true;
   handle_not_found(usrInput);
+  return true;
 }
 
 int main() {
-  // Flush after every std::cout / std:cerr
   std::cout << std::unitbuf;
   std::cerr << std::unitbuf;
 
   while (true) {
     std::cout << "$ ";
-    handle_input();
+    if (handle_input()) break;
   }
+
+  return 0;
 }
