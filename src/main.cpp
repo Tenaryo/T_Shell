@@ -22,7 +22,7 @@ void handle_input() {
   std::unordered_map<std::string, std::function<void()>> commands {
     { "echo", cmd_echo },
     { "exit", cmd_exit }
-  }
+  };
   std::string command;
   std::cin >> command;
 
