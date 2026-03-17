@@ -6,6 +6,7 @@
 
 void cmd_echo() {
   std::string s;
+  std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
   std::getline(std::cin, s);
   std::cout << s << '\n';
 }
