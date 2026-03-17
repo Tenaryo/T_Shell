@@ -1,12 +1,13 @@
 #include <iostream>
 #include <string>
+#include <string_view>
 
-void inline handle_not_found(string_view usrInput) {
+void handle_not_found(std::string_view usrInput) {
   std::cerr << usrInput << ": command not found\n";
 }
 
 void handle_input() {
-  std::string_view usrInput;
+  std::string usrInput;
   std::cin >> usrInput;
   handle_not_found(usrInput);
 }
