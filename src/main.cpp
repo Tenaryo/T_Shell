@@ -11,7 +11,7 @@ bool handle_input() {
   std::cin >> usrInput;
   if (usrInput == "exit") return true;
   handle_not_found(usrInput);
-  return true;
+  return false;
 }
 
 int main() {
