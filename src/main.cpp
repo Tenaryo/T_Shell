@@ -5,11 +5,10 @@
 #include <sys/wait.h>
 #include <unistd.h>
 
-void exec_external(const std::string &full, std::vector<std::string>& args) {
+void exec_external(std::vector<std::string>& tokens) {
     std::vector<char *> argv;
-    argv.push_back(const_cast<char *>(full.data()));
-    for (auto &s : args)
-        argv.push_back(s.data());
+    for (auto &token : tokens)
+        argv.push_back(const_cast<char *>(token.c_str()));
     argv.push_back(nullptr);
 
     pid_t pid = fork();
@@ -27,19 +26,18 @@ void exec_external(const std::string &full, std::vector<std::string>& args) {
 
 void exec_shell() {
     std::cout << "$ ";
-    std::string command;
-    std::cin >> command;
+    std::string line;
+    std::getline(std::cin, line);
+    if (line.empty()) return;
+    auto tokens = tokenize(line);
 
-    auto it = cmd::commands.find(command);
+    auto it = cmd::commands.find(tokens[0]);
     if (it != cmd::commands.end()) {
-        it->second();
-    } else if (auto full = search_path(command)) {
-        std::string args;
-        std::getline(std::cin >> std::ws, args);
-        auto tokens = tokenize(args);
-        exec_external(command, tokens);
+        it->second(tokens);
+    } else if (search_path(tokens[0]) != std::nullopt) {
+        exec_external(tokens);
     } else {
-        std::cerr << command << ": command not found\n";
+        std::cerr << tokens[0] << ": command not found\n";
     }
 }
 

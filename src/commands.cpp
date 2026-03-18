@@ -5,9 +5,8 @@
 #include <sstream>
 #include <filesystem>
 
-void cmd::cd() {
-    std::string dir;
-    std::getline(std::cin >> std::ws, dir);
+void cmd::cd(std::vector<std::string>& tokens) {
+    std::string& dir = tokens[1];
 
     if (!dir.empty() && dir[0] == '~') {
         const char* home = getenv("HOME");
@@ -25,7 +24,7 @@ void cmd::cd() {
     }
 }
 
-void cmd::pwd() {
+void cmd::pwd(std::vector<std::string>& tokens) {
     try {
         std::filesystem::path cwd = std::filesystem::current_path();
         std::cout << cwd.string() << '\n';
@@ -34,35 +33,28 @@ void cmd::pwd() {
     }
 }
 
-void cmd::type() {
-    std::string command;
-    std::getline(std::cin >> std::ws, command);
-    std::stringstream ss(command);
-
-    while (ss >> command) {
-        auto it = cmd::commands.find(command);
+void cmd::type(std::vector<std::string>& tokens) {
+    for (int i = 1; i < tokens.size(); i++) {
+        auto it = cmd::commands.find(tokens[i]);
         if (it != cmd::commands.end()) {
         std::cout << it->first << " is a shell builtin\n";
-        } else if (auto full = search_path(command)) {
-        std::cout << command << " is " << full->string() << '\n';
+        } else if (auto full = search_path(tokens[i])) {
+        std::cout << tokens[i] << " is " << full->string() << '\n';
         } else {
-        std::cerr << command << ": not found\n";
+        std::cerr << tokens[i] << ": not found\n";
         }
     }
 }
 
-void cmd::echo() {
-    std::string s;
-    std::getline(std::cin >> std::ws, s);
-    auto tokens = tokenize(s);
-    if (tokens.empty()) return;
-    std::cout << tokens[0];
-    for (int i = 1; i < tokens.size(); i++) {
+void cmd::echo(std::vector<std::string>& tokens) {
+    if (tokens.size() == 1) return;
+    std::cout << tokens[1];
+    for (int i = 2; i < tokens.size(); i++) {
         std::cout << ' ' << tokens[i];
     }
     std::cout << '\n';
 }
 
-void cmd::exit() {
+void cmd::exit(std::vector<std::string>& tokens) {
     std::exit(0); 
 }
