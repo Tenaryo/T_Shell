@@ -1,6 +1,7 @@
 #include <utils.hpp>
 
 #include <sstream>
+#include <iostream>
 #include <unistd.h>
 
 std::optional<std::filesystem::path> search_path(std::string command) {
@@ -36,8 +37,11 @@ std::vector<std::string> tokenize(std::string s) {
         } else if (c == '\"' && !is_in_single_quote) {
             is_in_double_quote = !is_in_double_quote;
         } else if (c == '\\') {
-            if (!is_in_single_quote) cur += s[++i];
-            else cur += c;
+            if (!is_in_single_quote && !is_in_double_quote) cur += s[++i];
+            else if (is_in_double_quote) {
+                if (i == s.size() - 1) std::cerr << "unclosed double quote\n";
+                else if (s[i + 1] == '\\' || s[i + 1] == '\"') cur += s[++i];
+            } else cur += c;
         } else {
             cur += c;
         }
