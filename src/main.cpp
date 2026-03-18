@@ -20,7 +20,7 @@ void handle_not_found(std::string_view command) {
 }
 
 void handle_input() {
-  constexpr static std::unordered_map<std::string, std::function<void()>> commands {
+  static const std::unordered_map<std::string, std::function<void()>> commands {
     { "echo", cmd_echo },
     { "exit", cmd_exit }
   };
