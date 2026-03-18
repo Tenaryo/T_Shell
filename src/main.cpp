@@ -1,26 +1,27 @@
 #include <filesystem>
+#include <functional>
 #include <iostream>
 #include <optional>
-#include <string>
-#include <string_view>
 #include <sstream>
-#include <unordered_map>
-#include <functional>
-#include <unistd.h>
+#include <string>
 #include <sys/wait.h>
+#include <unistd.h>
+#include <unordered_map>
 
+void cmd_pwd();
 void cmd_type();
 void cmd_echo();
 void cmd_exit();
 
-static const std::unordered_map<std::string, std::function<void()>> commands {
-  { "type", cmd_type },
-  { "echo", cmd_echo },
-  { "exit", cmd_exit }
+static const std::unordered_map<std::string, std::function<void()>> commands{
+  {"pwd", cmd_pwd},
+  {"type", cmd_type},
+  {"echo", cmd_echo},
+  {"exit", cmd_exit}
 };
 
 std::optional<std::filesystem::path> search_path(std::string command) {
-  static const char* cpath = getenv("PATH");
+  static const char *cpath = getenv("PATH");
   std::stringstream ss(cpath);
   std::string dir;
   while (getline(ss, dir, ':')) {
@@ -30,6 +31,15 @@ std::optional<std::filesystem::path> search_path(std::string command) {
     }
   }
   return std::nullopt;
+}
+
+void cmd_pwd() {
+  try {
+    std::filesystem::path cwd = std::filesystem::current_path();
+    std::cout << cwd.string() << '\n';
+  } catch (const std::filesystem::filesystem_error &e) {
+    perror("Failed to get cwd");
+  }
 }
 
 void cmd_type() {
@@ -55,21 +65,22 @@ void cmd_echo() {
   std::cout << s << '\n';
 }
 
-void cmd_exit() {
-  exit(0);
-}
+void cmd_exit() { exit(0); }
 
-void exec_external(const std::string& full, const std::string& orig_args) {
+void exec_external(const std::string &full, const std::string &orig_args) {
   std::stringstream ss(orig_args);
   std::string token;
   std::vector<std::string> args;
 
-  while (ss >> token) args.push_back(token);
-  if (args.empty()) return;
+  while (ss >> token)
+    args.push_back(token);
+  if (args.empty())
+    return;
 
-  std::vector<char*> argv;
-  argv.push_back(const_cast<char*>(full.data()));
-  for (auto& s : args) argv.push_back(s.data());
+  std::vector<char *> argv;
+  argv.push_back(const_cast<char *>(full.data()));
+  for (auto &s : args)
+    argv.push_back(s.data());
   argv.push_back(nullptr);
 
   pid_t pid = fork();
