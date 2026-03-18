@@ -17,7 +17,7 @@ static const std::unordered_map<std::string, std::function<void()>> commands {
   { "exit", cmd_exit }
 };
 
-std::optional<std::string> search_path(std::string command) {
+std::optional<std::filesystem::path> search_path(std::string command) {
   static const char* cpath = getenv("PATH");
   std::stringstream ss(cpath);
   std::string dir;
