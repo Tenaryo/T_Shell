@@ -7,7 +7,6 @@
 void cmd_echo() {
   std::string s;
   std::getline(std::cin, s);
-  std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
   std::cout << s << '\n';
 }
 
@@ -19,11 +18,12 @@ void handle_not_found(std::string_view command) {
   std::cerr << command << ": command not found\n";
 }
 
-void handle_input() {
+void exec_shell() {
   static const std::unordered_map<std::string, std::function<void()>> commands {
     { "echo", cmd_echo },
     { "exit", cmd_exit }
   };
+  std::cout << "$ ";
   std::string command;
   std::cin >> command;
 
@@ -37,8 +37,7 @@ int main() {
   std::cerr << std::unitbuf;
 
   while (true) {
-    std::cout << "$ ";
-    handle_input();
+    exec_shell();
   }
 
   return 0;
