@@ -1,3 +1,4 @@
+#include <unistd.h>
 #include <filesystem>
 #include <iostream>
 #include <optional>
@@ -23,7 +24,7 @@ std::optional<std::filesystem::path> search_path(std::string command) {
   std::string dir;
   while (getline(ss, dir, ':')) {
     std::filesystem::path full = std::filesystem::path(dir) / command;
-    if (std::filesystem::exists(full)) {
+    if (std::filesystem::exists(full) && access(full.c_str(), X_OK) == 0) {
       return full;
     }
   }
