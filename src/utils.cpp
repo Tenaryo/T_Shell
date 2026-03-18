@@ -31,12 +31,16 @@ std::vector<std::string> tokenize(std::string s) {
             continue;
         }
 
-        if (c == '\'' && !is_in_double_quote)
+        if (c == '\'' && !is_in_double_quote) {
             is_in_single_quote = !is_in_single_quote;
-        else if (c == '\"' && !is_in_single_quote) 
+        } else if (c == '\"' && !is_in_single_quote) {
             is_in_double_quote = !is_in_double_quote;
-        else if (c == '\\') cur += s[++i];
-        else cur += c;
+        } else if (c == '\\') {
+            if (!is_in_single_quote) cur += s[++i];
+            else cur += c;
+        } else {
+            cur += c;
+        }
     }
     if (!cur.empty()) ret.push_back(cur);
     return ret;
