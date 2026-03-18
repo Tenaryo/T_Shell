@@ -16,7 +16,6 @@ static const std::unordered_map<std::string, std::function<void()>> commands {
 };
 
 void handle_not_found(std::string_view command) {
-  std::cerr << command << ": command not found\n";
 }
 
 void cmd_type() {
@@ -29,7 +28,7 @@ void cmd_type() {
     if (it != commands.end()) {
       std::cout << it->first << " is a shell builtin\n";
     } else {
-      handle_not_found(command);
+      std::cerr << command << ": not found\n";
     }
   }
 }
@@ -51,7 +50,7 @@ void exec_shell() {
 
   auto it = commands.find(command);
   if (it != commands.end()) it->second();
-  else handle_not_found(command);
+  else std::cerr << command << ": command not found\n";
 }
 
 int main() {
