@@ -96,7 +96,7 @@ void exec_shell() {
   } else if (auto full = search_path(command)) {
     std::string args;
     std::getline(std::cin >> std::ws, args);
-    exec_external(full->string(), args);
+    exec_external(command, args);
   } else {
     std::cerr << command << ": command not found\n";
   }
