@@ -6,7 +6,7 @@
 
 void cmd_echo() {
   std::string s;
-  std::getline(std::cin, s);
+  std::getline(std::cin >> std::ws, s);
   std::cout << s << '\n';
 }
 
