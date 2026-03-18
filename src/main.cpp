@@ -5,16 +5,7 @@
 #include <sys/wait.h>
 #include <unistd.h>
 
-void exec_external(const std::string &full, const std::string &orig_args) {
-    std::stringstream ss(orig_args);
-    std::string token;
-    std::vector<std::string> args;
-
-    while (ss >> token)
-        args.push_back(token);
-    if (args.empty())
-        return;
-
+void exec_external(const std::string &full, std::vector<std::string>& args) {
     std::vector<char *> argv;
     argv.push_back(const_cast<char *>(full.data()));
     for (auto &s : args)
@@ -45,7 +36,8 @@ void exec_shell() {
     } else if (auto full = search_path(command)) {
         std::string args;
         std::getline(std::cin >> std::ws, args);
-        exec_external(command, args);
+        auto tokens = tokenize(args);
+        exec_external(command, tokens);
     } else {
         std::cerr << command << ": command not found\n";
     }

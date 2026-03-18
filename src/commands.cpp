@@ -54,7 +54,13 @@ void cmd::type() {
 void cmd::echo() {
     std::string s;
     std::getline(std::cin >> std::ws, s);
-    std::cout << s << '\n';
+    auto tokens = tokenize(s);
+    if (tokens.empty()) return;
+    std::cout << tokens[0];
+    for (int i = 1; i < tokens.size(); i++) {
+        std::cout << ' ' << tokens[i];
+    }
+    std::cout << '\n';
 }
 
 void cmd::exit() {
