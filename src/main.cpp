@@ -1,4 +1,3 @@
-#include <unistd.h>
 #include <filesystem>
 #include <iostream>
 #include <optional>
@@ -7,6 +6,8 @@
 #include <sstream>
 #include <unordered_map>
 #include <functional>
+#include <unistd.h>
+#include <sys/wait.h>
 
 void cmd_type();
 void cmd_echo();
@@ -58,14 +59,44 @@ void cmd_exit() {
   exit(0);
 }
 
+void exec_external(const std::string& full) {
+  std::stringstream ss(full);
+  std::string token;
+  std::vector<std::string> args;
+
+  while (ss >> token) args.push_back(token);
+  if (args.empty()) return;
+
+  std::vector<char*> argv;
+  for (auto& s : args) argv.push_back(&s[0]);
+  argv.push_back(nullptr);
+
+  pid_t pid = fork();
+  if (pid == 0) {
+    execvp(argv[0], argv.data());
+    perror("execvp failed");
+    exit(1);
+  } else if (pid > 0) {
+    int status;
+    waitpid(pid, &status, 0);
+  } else {
+    perror("fork failed");
+  }
+}
+
 void exec_shell() {
   std::cout << "$ ";
   std::string command;
   std::cin >> command;
 
   auto it = commands.find(command);
-  if (it != commands.end()) it->second();
-  else std::cerr << command << ": command not found\n";
+  if (it != commands.end()) {
+    it->second();
+  } else if (auto full = search_path(command)) {
+    exec_external(full->string());
+  } else {
+    std::cerr << command << ": command not found\n";
+  }
 }
 
 int main() {
