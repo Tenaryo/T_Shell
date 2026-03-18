@@ -40,7 +40,7 @@ void cmd_type() {
     if (it != commands.end()) {
       std::cout << it->first << " is a shell builtin\n";
     } else if (auto full = search_path(command)) {
-      std::cout << command << " is " << *full << '\n';
+      std::cout << command << " is " << full->string() << '\n';
     } else {
       std::cerr << command << ": not found\n";
     }
