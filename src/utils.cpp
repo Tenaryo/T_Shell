@@ -21,7 +21,8 @@ std::vector<std::string> tokenize(std::string s) {
     bool is_in_single_quote{false};
     bool is_in_double_quote{false};
     std::string cur;
-    for (char c : s) {
+    for (int i = 0; i < s.size(); i++) {
+        char c = s[i];
         if (std::isspace(c) && !is_in_single_quote && !is_in_double_quote) {
             if (!cur.empty()) {
                 ret.push_back(cur);
@@ -34,6 +35,7 @@ std::vector<std::string> tokenize(std::string s) {
             is_in_single_quote = !is_in_single_quote;
         else if (c == '\"' && !is_in_single_quote) 
             is_in_double_quote = !is_in_double_quote;
+        else if (c == '\\') cur += s[++i];
         else cur += c;
     }
     if (!cur.empty()) ret.push_back(cur);
