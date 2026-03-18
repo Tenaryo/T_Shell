@@ -18,10 +18,11 @@ std::optional<std::filesystem::path> search_path(std::string command) {
 
 std::vector<std::string> tokenize(std::string s) {
     std::vector<std::string> ret;
-    bool is_in_quote{false};
+    bool is_in_single_quote{false};
+    bool is_in_double_quote{false};
     std::string cur;
     for (char c : s) {
-        if (std::isspace(c) && !is_in_quote) {
+        if (std::isspace(c) && !is_in_single_quote && !is_in_double_quote) {
             if (!cur.empty()) {
                 ret.push_back(cur);
                 cur.clear();
@@ -29,7 +30,10 @@ std::vector<std::string> tokenize(std::string s) {
             continue;
         }
 
-        if (c == '\'') is_in_quote = !is_in_quote;
+        if (c == '\'' && !is_in_double_quote)
+            is_in_single_quote = !is_in_single_quote;
+        else if (c == '\"' && !is_in_single_quote) 
+            is_in_double_quote = !is_in_double_quote;
         else cur += c;
     }
     if (!cur.empty()) ret.push_back(cur);
