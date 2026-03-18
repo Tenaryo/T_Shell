@@ -1,4 +1,6 @@
+#include <filesystem>
 #include <iostream>
+#include <optional>
 #include <string>
 #include <string_view>
 #include <sstream>
@@ -15,7 +17,17 @@ static const std::unordered_map<std::string, std::function<void()>> commands {
   { "exit", cmd_exit }
 };
 
-void handle_not_found(std::string_view command) {
+std::optional<std::string> search_path(std::string command) {
+  static const char* cpath = getenv("PATH");
+  std::stringstream ss(cpath);
+  std::string dir;
+  while (getline(ss, dir, ':')) {
+    std::filesystem::path full = std::filesystem::path(dir) / command;
+    if (std::filesystem::exists(full)) {
+      return full;
+    }
+  }
+  return std::nullopt;
 }
 
 void cmd_type() {
@@ -25,7 +37,7 @@ void cmd_type() {
 
   while (ss >> command) {
     auto it = commands.find(command);
-    if (it != commands.end()) {
+    if (it != commands.end() || search_path(command) != std::nullopt) {
       std::cout << it->first << " is a shell builtin\n";
     } else {
       std::cerr << command << ": not found\n";
