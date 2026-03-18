@@ -27,7 +27,8 @@ void handle_input() {
   std::string command;
   std::cin >> command;
 
-  if (commands.count(command)) commands[command]();
+  auto it = commands.find(command);
+  if (it != commands.end()) it->second();
   else handle_not_found(command);
 }
 
