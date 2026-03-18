@@ -59,8 +59,8 @@ void cmd_exit() {
   exit(0);
 }
 
-void exec_external(const std::string& full) {
-  std::stringstream ss(full);
+void exec_external(const std::string& full, const std::string& orig_args) {
+  std::stringstream ss(orig_args);
   std::string token;
   std::vector<std::string> args;
 
@@ -68,7 +68,8 @@ void exec_external(const std::string& full) {
   if (args.empty()) return;
 
   std::vector<char*> argv;
-  for (auto& s : args) argv.push_back(&s[0]);
+  argv.push_back(const_cast<char*>(full.data()));
+  for (auto& s : args) argv.push_back(s.data());
   argv.push_back(nullptr);
 
   pid_t pid = fork();
@@ -93,7 +94,9 @@ void exec_shell() {
   if (it != commands.end()) {
     it->second();
   } else if (auto full = search_path(command)) {
-    exec_external(full->string());
+    std::string args;
+    std::getline(std::cin >> std::ws, args);
+    exec_external(full->string(), args);
   } else {
     std::cerr << command << ": command not found\n";
   }
