@@ -37,7 +37,12 @@ std::vector<Token> lexer(const std::string& s) {
                 cur.pop_back();
             }
             if (!cur.empty()) ret.emplace_back(TokenType::Word, cur);
-            ret.emplace_back(TokenType::Redirect, fd + ">");
+            if (i + 1 < s.size() && s[i + 1] == '>') {
+                ret.emplace_back(TokenType::Redirect, fd + ">>");
+                i++;
+            } else {
+                ret.emplace_back(TokenType::Redirect, fd + ">");
+            }
             cur.clear();
         } else {
             cur += c;

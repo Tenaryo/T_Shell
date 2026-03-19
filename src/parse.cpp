@@ -14,8 +14,15 @@ Pipeline parse(const std::vector<Token>& tokens) {
         }
         if (i + 1 < tokens.size() && tokens[i].type == TokenType::Redirect) {
             if (i + 1 < tokens.size()) {
-                if (tokens[i].value == "1>" || tokens[i].value == ">") cmd.redirect = { 1, tokens[++i].value, RedirectOp::Replace };
-                else if (tokens[i].value == "2>") cmd.redirect = { 2, tokens[++i].value, RedirectOp::Replace };
+                if (tokens[i].value == "1>" || tokens[i].value == ">") {
+                    cmd.redirect = { 1, tokens[++i].value, RedirectOp::Replace };
+                } else if (tokens[i].value == "2>") {
+                    cmd.redirect = { 2, tokens[++i].value, RedirectOp::Replace };
+                } else if (tokens[i].value == "1>>" || tokens[i].value == ">>") {
+                    cmd.redirect = { 1, tokens[++i].value, RedirectOp::Append };
+                } else if (tokens[i].value == "2>>") {
+                    cmd.redirect = { 2, tokens[++i].value, RedirectOp::Append };
+                }
             } else {
                 // TODO: error handling
                 std::cerr << "parse error near \\n\n";

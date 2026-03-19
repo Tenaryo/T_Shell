@@ -23,7 +23,7 @@ static void exec_external(Command& cmd) {
             auto& rd = cmd.redirect.value();
             switch (rd.fd) {
                 case 1: {
-                    CoutRedirect r(rd.target);
+                    CoutRedirect r(rd.target, rd.op);
                     if (!r) {
                         std::cerr << "Failed to redirect\n";
                         exit(1);
@@ -33,7 +33,7 @@ static void exec_external(Command& cmd) {
                     exit(1);
                 }
                 case 2: {
-                    CerrRedirect r(rd.target);
+                    CerrRedirect r(rd.target, rd.op);
                     if (!r) {
                         std::cerr << "Failed to redirect\n";
                         exit(1);
@@ -64,7 +64,7 @@ void execute(Pipeline pipe) {
                 auto& rd = cmd.redirect.value();
                 switch (rd.fd) {
                     case 1: {
-                        CoutRedirect r(rd.target);
+                        CoutRedirect r(rd.target, rd.op);
                         if (!r) {
                             std::cerr << "Failed to redirect\n";
                             continue;
@@ -73,7 +73,7 @@ void execute(Pipeline pipe) {
                         break;
                     }
                     case 2: {
-                        CerrRedirect r(rd.target);
+                        CerrRedirect r(rd.target, rd.op);
                         if (!r) {
                             std::cerr << "Failed to redirect\n";
                             continue;
@@ -91,7 +91,7 @@ void execute(Pipeline pipe) {
             if (cmd.redirect != std::nullopt) {
                 auto& rd = cmd.redirect.value();
                 if (rd.fd == 2) {
-                    CerrRedirect r(rd.target);
+                    CerrRedirect r(rd.target, rd.op);
                     if (!r) {
                         std::cerr << "Failed to redirect\n";
                         continue;

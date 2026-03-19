@@ -15,7 +15,7 @@ void cd(const Command& cmd) {
     }
 
     std::string dir;
-    if (cmd.args.size() == 0) dir = "~";
+    if (cmd.args.empty()) dir = "~";
     else dir = cmd.args[0];
 
     if (dir[0] == '~') {

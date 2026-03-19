@@ -1,4 +1,5 @@
 #pragma once
+#include <types.hpp>
 #include <string>
 #include <optional>
 #include <fcntl.h>
@@ -34,12 +35,12 @@ private:
 
 class CoutRedirect : public FdRedirect {
 public:
-    explicit CoutRedirect(const std::string& filename, int flags = O_WRONLY | O_CREAT | O_TRUNC);
+    explicit CoutRedirect(const std::string& filename, RedirectOp op);
 };
 
 class CerrRedirect : public FdRedirect {
 public:
-    explicit CerrRedirect(const std::string& filename, int flags = O_WRONLY | O_CREAT | O_TRUNC);
+    explicit CerrRedirect(const std::string& filename, RedirectOp op);
 };
 
 std::optional<std::string> search_path(const std::string& program);

@@ -3,7 +3,7 @@
 #include <execute.hpp>
 #include <iostream>
 
-void handle_cmd(const std::string& line) {
+static void handle_cmd(const std::string& line) {
     if (line.empty()) return;
 
     auto tokens = shell::lexer(line);

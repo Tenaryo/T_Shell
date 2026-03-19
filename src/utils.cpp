@@ -66,11 +66,17 @@ void FdRedirect::steal_from(FdRedirect& other) noexcept {
     other.ok_ = false;
 }
 
-CoutRedirect::CoutRedirect(const std::string& filename, int flags) {
+CoutRedirect::CoutRedirect(const std::string& filename, RedirectOp op) {
+    int flags = (op == RedirectOp::Append)
+        ? (O_WRONLY | O_CREAT | O_APPEND)
+        : (O_WRONLY | O_CREAT | O_TRUNC);
     init(STDOUT_FILENO, filename, flags, 0644);
 }
 
-CerrRedirect::CerrRedirect(const std::string& filename, int flags) {
+CerrRedirect::CerrRedirect(const std::string& filename, RedirectOp op) {
+    int flags = (op == RedirectOp::Append)
+        ? (O_WRONLY | O_CREAT | O_APPEND)
+        : (O_WRONLY | O_CREAT | O_TRUNC);
     init(STDERR_FILENO, filename, flags, 0644);
 }
 

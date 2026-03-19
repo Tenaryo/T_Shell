@@ -2,7 +2,14 @@ cmake_minimum_required(VERSION 3.13)
 
 project(tshell)
 
-file(GLOB_RECURSE SOURCE_FILES src/*.cpp)
+set(SOURCE_FILES
+    src/main.cpp
+    src/lexer.cpp
+    src/parse.cpp
+    src/execute.cpp
+    src/commands.cpp
+    src/utils.cpp
+)
 
 set(CMAKE_CXX_STANDARD 23)
 
