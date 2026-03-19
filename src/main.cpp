@@ -3,7 +3,7 @@
 #include <execute.hpp>
 #include <iostream>
 
-void handle_exec_cmd(const std::string& line) {
+void handle_cmd(const std::string& line) {
     if (line.empty()) return;
 
     auto tokens = shell::lexer(line);
@@ -19,8 +19,8 @@ int main() {
     while (true) {
         std::cout << "$ ";
         std::string line;
-        std::getline(std::cin, line);
-        handle_exec_cmd(std::move(line));
+        std::getline(std::cin >> std::ws, line);
+        handle_cmd(std::move(line));
     }
 
     return 0;

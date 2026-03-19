@@ -7,7 +7,7 @@ namespace shell {
 
 enum class TokenType {
     Word,
-    Redict,
+    Redirect,
 };
 
 struct Token {
