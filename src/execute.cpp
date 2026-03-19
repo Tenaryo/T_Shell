@@ -6,7 +6,6 @@
 #include <filesystem>
 #include <sys/wait.h>
 #include <sys/stat.h>
-#include <fcntl.h>
 
 namespace shell {
 
@@ -22,24 +21,28 @@ static void exec_external(Command& cmd) {
     if (pid == 0) {
         if (cmd.redirect != std::nullopt) {
             auto& rd = cmd.redirect.value();
-            int flags;
-            mode_t mode = 0644;
-            switch (rd.op) {
-                case RedirectOp::Replace:
-                    flags = O_WRONLY | O_CREAT | O_TRUNC;
-                    break;
+            switch (rd.fd) {
+                case 1: {
+                    CoutRedirect r(rd.target);
+                    if (!r) {
+                        std::cerr << "Failed to redirect\n";
+                        exit(1);
+                    }
+                    execvp(argv[0], argv.data());
+                    std::cerr << "execvp failed\n";
+                    exit(1);
+                }
+                case 2: {
+                    CerrRedirect r(rd.target);
+                    if (!r) {
+                        std::cerr << "Failed to redirect\n";
+                        exit(1);
+                    }
+                    execvp(argv[0], argv.data());
+                    std::cerr << "execvp failed\n";
+                    exit(1);
+                }
             }
-            int fd = open(rd.target.c_str(), flags, mode);
-            if (fd < 0) {
-                std::cerr << "Failed to open " << rd.target << '\n';
-                exit(1);
-            }
-
-            if (dup2(fd, rd.fd) < 0) {
-                std::cerr << "dup2 failed\n";
-                exit(1);
-            }
-            close(fd);
         }
         execvp(argv[0], argv.data());
         std::cerr << "execvp failed\n";
@@ -59,52 +62,45 @@ void execute(Pipeline pipe) {
         if (it != Commands::cmds.end()) {
             if (cmd.redirect != std::nullopt) {
                 auto& rd = cmd.redirect.value();
-
-                int saved_fd = dup(rd.fd);
-                if (saved_fd < 0) {
-                    std::cerr << "Failed to save fd\n";
-                    close(saved_fd);
-                    continue;
-                }
-
-                int flags;
-                mode_t mode = 0644;
-                switch (rd.op) {
-                    case RedirectOp::Replace:
-                        flags = O_WRONLY | O_CREAT | O_TRUNC;
+                switch (rd.fd) {
+                    case 1: {
+                        CoutRedirect r(rd.target);
+                        if (!r) {
+                            std::cerr << "Failed to redirect\n";
+                            continue;
+                        }
+                        it->second(cmd);
                         break;
+                    }
+                    case 2: {
+                        CerrRedirect r(rd.target);
+                        if (!r) {
+                            std::cerr << "Failed to redirect\n";
+                            continue;
+                        }
+                        it->second(cmd);
+                        break;
+                    }
                 }
-
-                int fd = open(rd.target.c_str(), flags, mode);
-                if (fd < 0) {
-                    std::cerr << "Failed to open " << rd.target << '\n';
-                    close(fd);
-                    close(saved_fd);
-                    continue;
-                }
-
-                if (dup2(fd, rd.fd) < 0) {
-                    std::cerr << "dup2 failed\n";
-                    close(fd);
-                    close(saved_fd);
-                    continue;
-                }
-                close(fd);
-
-                it->second(cmd);
-
-                dup2(saved_fd, rd.fd);
-                if (dup2(saved_fd, rd.fd) < 0) {
-                    std::cerr << "Failed to restore fd\n";
-                }
-                close(saved_fd);
             } else {
                 it->second(cmd);
             }
         } else if (search_path(cmd.program)) {
             exec_external(cmd);
         } else {
-            std::cerr << cmd.program << ": command not found\n";
+            if (cmd.redirect != std::nullopt) {
+                auto& rd = cmd.redirect.value();
+                if (rd.fd == 2) {
+                    CerrRedirect r(rd.target);
+                    if (!r) {
+                        std::cerr << "Failed to redirect\n";
+                        continue;
+                    }
+                    std::cerr << cmd.program << ": command not found\n";
+                }
+            } else {
+                std::cerr << cmd.program << ": command not found\n";
+            }
         }
     }
 }

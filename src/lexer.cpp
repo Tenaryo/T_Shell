@@ -31,11 +31,13 @@ std::vector<Token> lexer(const std::string& s) {
                 else if (s[i + 1] == '\\' || s[i + 1] == '\"') cur += s[++i];
             } else cur += c;
         } else if (c == '>' && !is_in_double_quote && !is_in_single_quote) {
-            if (!cur.empty() && cur.back() == '1') {
+            std::string fd = "";
+            if (!cur.empty() && (cur.back() == '1' || cur.back() == '2')) {
+                fd += cur.back();
                 cur.pop_back();
             }
             if (!cur.empty()) ret.emplace_back(TokenType::Word, cur);
-            ret.emplace_back(TokenType::Redirect, "1>");
+            ret.emplace_back(TokenType::Redirect, fd + ">");
             cur.clear();
         } else {
             cur += c;
