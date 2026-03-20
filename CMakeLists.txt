@@ -4,6 +4,7 @@ project(tshell)
 
 set(SOURCE_FILES
     src/main.cpp
+    src/reader.cpp
     src/lexer.cpp
     src/parse.cpp
     src/execute.cpp
@@ -12,10 +13,14 @@ set(SOURCE_FILES
 )
 
 set(CMAKE_CXX_STANDARD 23)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 add_executable(shell ${SOURCE_FILES})
 
-target_include_directories(shell
-    PRIVATE
-        ${CMAKE_SOURCE_DIR}/include
-)
+target_compile_options(shell PRIVATE -Wall -Wextra -Wpedantic)
+
+find_package(PkgConfig REQUIRED)
+pkg_check_modules(READLINE REQUIRED readline)
+target_link_libraries(shell PRIVATE ${READLINE_LIBRARIES})
+
+target_include_directories(shell PRIVATE ${PROJECT_SOURCE_DIR}/include)

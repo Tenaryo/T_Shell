@@ -13,9 +13,11 @@ enum class TokenType {
 struct Token {
     TokenType type;
     std::string value;
+
+    Token(TokenType t, std::string v) : type(t), value(std::move(v)) {};
 };
 
-enum class RedirectOp{
+enum class RedirectOp {
     Replace,
     Append,
 };

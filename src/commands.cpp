@@ -61,7 +61,7 @@ void type(const Command& cmd) {
 void echo(const Command& cmd) {
     if (cmd.args.empty()) return;
     std::cout << cmd.args[0];
-    for (int i = 1; i < cmd.args.size(); i++) {
+    for (size_t i = 1; i < cmd.args.size(); i++) {
         std::cout << ' ' << cmd.args[i];
     }
     std::cout << '\n';

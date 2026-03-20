@@ -3,6 +3,6 @@
 
 namespace shell {
 
-void execute(Pipeline pipe);
+void execute(const Pipeline& pipe);
 
 } // namespace shell

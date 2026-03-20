@@ -8,7 +8,7 @@ std::vector<Token> lexer(const std::string& s) {
     bool is_in_single_quote{false};
     bool is_in_double_quote{false};
     std::string cur;
-    for (int i = 0; i < s.size(); i++) {
+    for (size_t i = 0; i < s.size(); i++) {
         char c = s[i];
         if (std::isspace(c) && !is_in_single_quote && !is_in_double_quote) {
             if (!cur.empty()) {
@@ -31,7 +31,7 @@ std::vector<Token> lexer(const std::string& s) {
                 else if (s[i + 1] == '\\' || s[i + 1] == '\"') cur += s[++i];
             } else cur += c;
         } else if (c == '>' && !is_in_double_quote && !is_in_single_quote) {
-            std::string fd = "";
+            std::string fd;
             if (!cur.empty() && (cur.back() == '1' || cur.back() == '2')) {
                 fd += cur.back();
                 cur.pop_back();

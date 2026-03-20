@@ -5,14 +5,15 @@ namespace shell {
 
 Pipeline parse(const std::vector<Token>& tokens) {
     Pipeline ret;
-    for (int i = 0; i < tokens.size(); i++) {
+    for (size_t i = 0; i < tokens.size(); i++) {
         Command cmd;
         cmd.program = tokens[i++].value;
         while (i < tokens.size() && tokens[i].type == TokenType::Word) {
             cmd.args.push_back(tokens[i].value);
             i++;
         }
-        if (i + 1 < tokens.size() && tokens[i].type == TokenType::Redirect) {
+        if (i == tokens.size()) { ret.push_back(cmd); break; }
+        if (tokens[i].type == TokenType::Redirect) {
             if (i + 1 < tokens.size()) {
                 if (tokens[i].value == "1>" || tokens[i].value == ">") {
                     cmd.redirect = { 1, tokens[++i].value, RedirectOp::Replace };

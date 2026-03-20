@@ -9,7 +9,7 @@
 
 namespace shell {
 
-static void exec_external(Command& cmd) {
+static void exec_external(const Command& cmd) {
     std::vector<char*> argv;
     argv.push_back(const_cast<char*>(cmd.program.c_str()));
     for (auto& arg : cmd.args) {
@@ -19,7 +19,7 @@ static void exec_external(Command& cmd) {
 
     pid_t pid = fork();
     if (pid == 0) {
-        if (cmd.redirect != std::nullopt) {
+        if (cmd.redirect) {
             auto& rd = cmd.redirect.value();
             switch (rd.fd) {
                 case 1: {
@@ -55,12 +55,12 @@ static void exec_external(Command& cmd) {
     }
 }
 
-void execute(Pipeline pipe) {
+void execute(const Pipeline& pipe) {
     for (auto& cmd : pipe) {
         auto it = Commands::cmds.find(cmd.program);
 
         if (it != Commands::cmds.end()) {
-            if (cmd.redirect != std::nullopt) {
+            if (cmd.redirect) {
                 auto& rd = cmd.redirect.value();
                 switch (rd.fd) {
                     case 1: {
@@ -88,7 +88,7 @@ void execute(Pipeline pipe) {
         } else if (search_path(cmd.program)) {
             exec_external(cmd);
         } else {
-            if (cmd.redirect != std::nullopt) {
+            if (cmd.redirect) {
                 auto& rd = cmd.redirect.value();
                 if (rd.fd == 2) {
                     CerrRedirect r(rd.target, rd.op);

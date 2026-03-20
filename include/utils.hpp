@@ -28,9 +28,9 @@ private:
     void release() noexcept;
     void steal_from(FdRedirect& other) noexcept;
 
-    int target_fd_;
-    int saved_fd_;
-    bool ok_;
+    int target_fd_{-1};
+    int saved_fd_{-1};
+    bool ok_{false};
 };
 
 class CoutRedirect : public FdRedirect {

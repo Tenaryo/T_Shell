@@ -1,4 +1,5 @@
 #include <utils.hpp>
+#include <iostream>
 #include <sstream>
 #include <filesystem>
 #include <unistd.h>
@@ -29,10 +30,8 @@ FdRedirect& FdRedirect::operator=(FdRedirect&& other) noexcept {
 
 void FdRedirect::init(int target_fd, const std::string& filename, int open_flags, mode_t mode) {
     target_fd_ = target_fd;
-    ok_ = false;
     saved_fd_ = dup(target_fd);
     if (saved_fd_ < 0) {
-        close(saved_fd_);
         return;
     }
 
@@ -52,7 +51,10 @@ void FdRedirect::init(int target_fd, const std::string& filename, int open_flags
 void FdRedirect::release() noexcept {
     if (!ok_) return;
 
-    dup2(saved_fd_, target_fd_);
+    if (dup2(saved_fd_, target_fd_) < 0) {
+        std::cerr << "Failed to restore fd\n";
+        std::exit(1);
+    }
     close(saved_fd_);
 
     ok_ = false;
@@ -82,6 +84,10 @@ CerrRedirect::CerrRedirect(const std::string& filename, RedirectOp op) {
 
 std::optional<std::string> search_path(const std::string& program) {
     static const char* cpath = getenv("PATH");
+    if (cpath == nullptr) {
+        std::cerr << "Failed to get path\n";
+        return std::nullopt;
+    }
     std::stringstream ss(cpath);
     std::string dir;
     while (std::getline(ss, dir, ':')) {
