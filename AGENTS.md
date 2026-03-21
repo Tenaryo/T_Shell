@@ -8,4 +8,3 @@
 6. Write cache-friendly and data-oriented code where performance matters.
 7. Avoid premature abstraction; keep designs simple and explicit.
 8. Be critical, you can challenge user's idea. If you think the user's plan is stupid, just tell the user directly.
-9. C++ include order: corresponding header first → C++ standard library → C standard library (use <cxxx>) → third-party libraries → project headers; sort alphabetically within each group and separate groups with blank lines.

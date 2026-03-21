@@ -2,6 +2,7 @@
 #include <executable_cache.hpp>
 #include <execute.hpp>
 #include <filesystem>
+#include <fstream>
 #include <iostream>
 #include <readline/history.h>
 
@@ -74,6 +75,25 @@ void echo(const Command& cmd) {
 void exit(const Command& /*cmd*/) { std::exit(0); }
 
 void history(const Command& cmd) {
+    if (!cmd.args.empty() && cmd.args[0] == "-r") {
+        if (cmd.args.size() < 2) {
+            std::cerr << "history: -r: missing filename\n";
+            return;
+        }
+        std::ifstream file(cmd.args[1]);
+        if (!file) {
+            std::cerr << "history: " << cmd.args[1] << ": cannot open file\n";
+            return;
+        }
+        std::string line;
+        while (std::getline(file, line)) {
+            if (!line.empty()) {
+                add_history(line.c_str());
+            }
+        }
+        return;
+    }
+
     HIST_ENTRY** entries = history_list();
     if (!entries)
         return;
