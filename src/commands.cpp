@@ -74,67 +74,103 @@ void echo(const Command& cmd) {
 
 void exit(const Command& /*cmd*/) { std::exit(0); }
 
-void history(const Command& cmd) {
-    if (!cmd.args.empty() && cmd.args[0] == "-r") {
-        if (cmd.args.size() < 2) {
-            std::cerr << "history: -r: missing filename\n";
-            return;
-        }
-        std::ifstream file(cmd.args[1]);
-        if (!file) {
-            std::cerr << "history: " << cmd.args[1] << ": cannot open file\n";
-            return;
-        }
-        std::string line;
-        while (std::getline(file, line)) {
-            if (!line.empty()) {
-                add_history(line.c_str());
-            }
-        }
+namespace history_impl {
+
+static int last_written = 0;
+
+static void do_read(const std::string& filename) {
+    std::ifstream file(filename);
+    if (!file) {
+        std::cerr << "history: " << filename << ": cannot open file\n";
         return;
     }
+    std::string line;
+    while (std::getline(file, line)) {
+        if (!line.empty()) {
+            add_history(line.c_str());
+        }
+    }
+}
 
-    if (!cmd.args.empty() && cmd.args[0] == "-w") {
-        if (cmd.args.size() < 2) {
-            std::cerr << "history: -w: missing filename\n";
-            return;
-        }
-        std::ofstream file(cmd.args[1]);
-        if (!file) {
-            std::cerr << "history: " << cmd.args[1] << ": cannot open file\n";
-            return;
-        }
-        HIST_ENTRY** entries = history_list();
-        if (entries) {
-            for (int i = 0; i < history_length; i++) {
-                file << entries[i]->line << '\n';
-            }
-        }
+static void do_write(const std::string& filename) {
+    std::ofstream file(filename);
+    if (!file) {
+        std::cerr << "history: " << filename << ": cannot open file\n";
         return;
     }
+    HIST_ENTRY** entries = history_list();
+    if (entries) {
+        for (int i = 0; i < history_length; i++) {
+            file << entries[i]->line << '\n';
+        }
+    }
+}
 
+static void do_append(const std::string& filename) {
+    std::ofstream file(filename, std::ios::app);
+    if (!file) {
+        std::cerr << "history: " << filename << ": cannot open file\n";
+        return;
+    }
+    HIST_ENTRY** entries = history_list();
+    if (entries) {
+        for (int i = last_written; i < history_length; i++) {
+            file << entries[i]->line << '\n';
+        }
+        last_written = history_length;
+    }
+}
+
+static void do_show(int count) {
     HIST_ENTRY** entries = history_list();
     if (!entries)
         return;
 
     int total = history_length;
-    int count = total;
-
-    if (!cmd.args.empty()) {
-        try {
-            count = std::stoi(cmd.args[0]);
-            if (count <= 0)
-                return;
-        } catch (...) {
-            std::cerr << "history: " << cmd.args[0] << ": invalid number\n";
-            return;
-        }
-    }
-
     int start = std::max(total - count, 0);
 
     for (int i = start; i < total; i++) {
         std::cout << "   " << i + 1 << "  " << entries[i]->line << '\n';
+    }
+}
+
+} // namespace history_impl
+
+void history(const Command& cmd) {
+    if (cmd.args.empty()) {
+        history_impl::do_show(history_length);
+        return;
+    }
+
+    const auto& opt = cmd.args[0];
+
+    if (opt == "-r") {
+        if (cmd.args.size() < 2) {
+            std::cerr << "history: -r: missing filename\n";
+            return;
+        }
+        history_impl::do_read(cmd.args[1]);
+    } else if (opt == "-w") {
+        if (cmd.args.size() < 2) {
+            std::cerr << "history: -w: missing filename\n";
+            return;
+        }
+        history_impl::do_write(cmd.args[1]);
+    } else if (opt == "-a") {
+        if (cmd.args.size() < 2) {
+            std::cerr << "history: -a: missing filename\n";
+            return;
+        }
+        history_impl::do_append(cmd.args[1]);
+    } else {
+        try {
+            int count = std::stoi(opt);
+            if (count <= 0)
+                return;
+            history_impl::do_show(count);
+        } catch (...) {
+            std::cerr << "history: " << opt << ": invalid number\n";
+        }
     }
 }
 
