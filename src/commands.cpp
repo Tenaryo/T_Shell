@@ -94,6 +94,25 @@ void history(const Command& cmd) {
         return;
     }
 
+    if (!cmd.args.empty() && cmd.args[0] == "-w") {
+        if (cmd.args.size() < 2) {
+            std::cerr << "history: -w: missing filename\n";
+            return;
+        }
+        std::ofstream file(cmd.args[1]);
+        if (!file) {
+            std::cerr << "history: " << cmd.args[1] << ": cannot open file\n";
+            return;
+        }
+        HIST_ENTRY** entries = history_list();
+        if (entries) {
+            for (int i = 0; i < history_length; i++) {
+                file << entries[i]->line << '\n';
+            }
+        }
+        return;
+    }
+
     HIST_ENTRY** entries = history_list();
     if (!entries)
         return;
