@@ -30,6 +30,12 @@ std::vector<Token> lexer(const std::string& s) {
                 if (i == s.size() - 1) std::cerr << "unclosed double quote\n";
                 else if (s[i + 1] == '\\' || s[i + 1] == '\"') cur += s[++i];
             } else cur += c;
+        } else if (c == '|' && !is_in_double_quote && !is_in_single_quote) {
+            if (!cur.empty()) {
+                ret.emplace_back(TokenType::Word, cur);
+                cur.clear();
+            }
+            ret.emplace_back(TokenType::Pipe, "|");
         } else if (c == '>' && !is_in_double_quote && !is_in_single_quote) {
             std::string fd;
             if (!cur.empty() && (cur.back() == '1' || cur.back() == '2')) {

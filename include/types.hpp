@@ -8,6 +8,7 @@ namespace shell {
 enum class TokenType {
     Word,
     Redirect,
+    Pipe,
 };
 
 struct Token {
