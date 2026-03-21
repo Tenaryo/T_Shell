@@ -72,14 +72,27 @@ void exit(const Command& /*cmd*/) {
     std::exit(0);
 }
 
-void history(const Command& /*cmd*/) {
+void history(const Command& cmd) {
     HIST_ENTRY** entries = history_list();
     if (!entries) return;
 
     int total = history_length;
+    int count = total;
 
-    for (int i = 0; i < total; i++) {
-        std::cout << "  " << i + 1 << "  " << entries[i]->line << '\n';
+    if (!cmd.args.empty()) {
+        try {
+            count = std::stoi(cmd.args[0]);
+            if (count <= 0) return;
+        } catch (...) {
+            std::cerr << "history: " << cmd.args[0] << ": invalid number\n";
+            return;
+        }
+    }
+
+    int start = std::max(total - count, 0);
+
+    for (int i = start; i < total; i++) {
+        std::cout << "   " << i + 1 << "  " << entries[i]->line << '\n';
     }
 }
 
