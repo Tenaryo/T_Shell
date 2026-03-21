@@ -18,7 +18,7 @@ int main() {
     std::cout << std::unitbuf;
     std::cerr << std::unitbuf;
 
-    shell::LineReader reader;
+    static shell::LineReader reader;
     reader.set_prompt("$ ");
 
     while (true) {

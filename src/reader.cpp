@@ -1,5 +1,6 @@
 #include <algorithm>
 #include <commands.hpp>
+#include <cstdlib>
 #include <cstring>
 #include <executable_cache.hpp>
 #include <reader.hpp>
@@ -44,7 +45,19 @@ static char** command_completion(const char* text, int start, int /*end*/) {
     return rl_completion_matches(text, command_generator);
 }
 
-LineReader::LineReader() { rl_attempted_completion_function = command_completion; }
+LineReader::LineReader() {
+    rl_attempted_completion_function = command_completion;
+    if (const char* hf = std::getenv("HISTFILE")) {
+        histfile_ = hf;
+        read_history(histfile_.c_str());
+    }
+}
+
+LineReader::~LineReader() {
+    if (!histfile_.empty()) {
+        write_history(histfile_.c_str());
+    }
+}
 
 std::string LineReader::read_line() {
     char* raw = readline(prompt_.c_str());
