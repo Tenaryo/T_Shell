@@ -123,6 +123,13 @@ static void exec_pipeline(const Pipeline& pipeline) {
             }
 
             apply_redirect(cmd);
+
+            auto it = Commands::cmds.find(cmd.program);
+            if (it != Commands::cmds.end()) {
+                it->second(cmd);
+                exit(0);
+            }
+
             auto argv = build_argv(cmd);
             execvp(argv[0], argv.data());
             std::cerr << cmd.program << ": command not found\n";
