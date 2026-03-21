@@ -1,6 +1,6 @@
 #include <commands.hpp>
 #include <execute.hpp>
-#include <utils.hpp>
+#include <executable_cache.hpp>
 #include <filesystem>
 #include <iostream>
 
@@ -34,7 +34,7 @@ void cd(const Command& cmd) {
     }
 }
 
-void pwd(const Command& cmd) {
+void pwd(const Command& /*cmd*/) {
     try {
         auto path = std::filesystem::current_path();
         std::cout << path.string() << '\n';
@@ -49,7 +49,7 @@ void type(const Command& cmd) {
         if (it != cmds.end()) {
             std::cout << arg << " is a shell builtin\n";
         } else {
-            if (auto full = search_path(arg)) {
+            if (auto full = ExecutableCache::instance().get_path(arg)) {
                 std::cout << arg << " is " << full.value() << '\n';
             } else {
                 std::cout << arg << ": not found\n";
@@ -67,7 +67,7 @@ void echo(const Command& cmd) {
     std::cout << '\n';
 }
 
-void exit(const Command& cmd) {
+void exit(const Command& /*cmd*/) {
     std::exit(0);
 }
 

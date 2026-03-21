@@ -9,7 +9,8 @@ set(SOURCE_FILES
     src/parse.cpp
     src/execute.cpp
     src/commands.cpp
-    src/utils.cpp
+    src/redirect.cpp
+    src/executable_cache.cpp
 )
 
 set(CMAKE_CXX_STANDARD 23)

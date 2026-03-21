@@ -1,9 +1,6 @@
-#include <utils.hpp>
+#include <redirect.hpp>
 #include <iostream>
-#include <sstream>
-#include <filesystem>
 #include <unistd.h>
-#include <fcntl.h>
 
 namespace shell {
 
@@ -80,23 +77,6 @@ CerrRedirect::CerrRedirect(const std::string& filename, RedirectOp op) {
         ? (O_WRONLY | O_CREAT | O_APPEND)
         : (O_WRONLY | O_CREAT | O_TRUNC);
     init(STDERR_FILENO, filename, flags, 0644);
-}
-
-std::optional<std::string> search_path(const std::string& program) {
-    static const char* cpath = getenv("PATH");
-    if (cpath == nullptr) {
-        std::cerr << "Failed to get path\n";
-        return std::nullopt;
-    }
-    std::stringstream ss(cpath);
-    std::string dir;
-    while (std::getline(ss, dir, ':')) {
-        std::filesystem::path full = std::filesystem::path(dir) / program;
-        if (std::filesystem::exists(full) && access(full.c_str(), X_OK) == 0) {
-            return full.string();
-        }
-    }
-    return std::nullopt;
 }
 
 } // namespace shell

@@ -1,41 +1,48 @@
 #include <reader.hpp>
 #include <commands.hpp>
+#include <executable_cache.hpp>
 #include <cstring>
-#include <cctype>
+#include <algorithm>
 #include <readline/readline.h>
 
 namespace shell {
 
-static char* builtin_generator(const char* text, int state) {
-    static const std::vector<std::string> builtin_cmds = [] {
+static char* command_generator(const char* text, int state) {
+    static const std::vector<std::string> all_cmds = [] {
         std::vector<std::string> ret;
-        ret.reserve(Commands::cmds.size());
         for (const auto& [k, _] : Commands::cmds) {
             ret.push_back(k);
         }
+        for (const auto& name : ExecutableCache::instance().names()) {
+            if (!Commands::cmds.contains(name)) {
+                ret.push_back(name);
+            }
+        }
+        std::sort(ret.begin(), ret.end());
         return ret;
     }();
+
     static unsigned int match_idx, text_len;
     if (!state) {
         match_idx = 0;
         text_len = strlen(text);
     }
 
-    while (match_idx < builtin_cmds.size()) {
-        const char* cmd = builtin_cmds[match_idx++].c_str();
+    while (match_idx < all_cmds.size()) {
+        const char* cmd = all_cmds[match_idx++].c_str();
         if (strncmp(cmd, text, text_len) == 0) return strdup(cmd);
     }
     return nullptr;
 }
 
-static char** builtin_completion(const char* text, int start, int /*end*/) {
+static char** command_completion(const char* text, int start, int /*end*/) {
     if (start != 0) return nullptr;
 
-    return rl_completion_matches(text, builtin_generator);
+    return rl_completion_matches(text, command_generator);
 }
 
 LineReader::LineReader() {
-    rl_attempted_completion_function = builtin_completion;
+    rl_attempted_completion_function = command_completion;
 }
 
 std::string LineReader::read_line() {

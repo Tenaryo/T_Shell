@@ -43,6 +43,4 @@ public:
     explicit CerrRedirect(const std::string& filename, RedirectOp op);
 };
 
-std::optional<std::string> search_path(const std::string& program);
-
 } // namespace shell

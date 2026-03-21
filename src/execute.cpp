@@ -1,7 +1,8 @@
 #include <execute.hpp>
+#include <redirect.hpp>
 #include <types.hpp>
 #include <commands.hpp>
-#include <utils.hpp>
+#include <executable_cache.hpp>
 #include <iostream>
 #include <filesystem>
 #include <sys/wait.h>
@@ -85,7 +86,7 @@ void execute(const Pipeline& pipe) {
             } else {
                 it->second(cmd);
             }
-        } else if (search_path(cmd.program)) {
+        } else if (ExecutableCache::instance().contains(cmd.program)) {
             exec_external(cmd);
         } else {
             if (cmd.redirect) {
