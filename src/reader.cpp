@@ -4,6 +4,7 @@
 #include <cstring>
 #include <algorithm>
 #include <readline/readline.h>
+#include <readline/history.h>
 
 namespace shell {
 
@@ -50,6 +51,9 @@ std::string LineReader::read_line() {
     if (!raw) std::exit(0);
 
     std::string line(raw);
+    if (!line.empty()) {
+        add_history(raw);
+    }
     free(raw);
 
     return line;

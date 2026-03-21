@@ -3,6 +3,7 @@
 #include <executable_cache.hpp>
 #include <filesystem>
 #include <iostream>
+#include <readline/history.h>
 
 namespace shell {
 
@@ -69,6 +70,17 @@ void echo(const Command& cmd) {
 
 void exit(const Command& /*cmd*/) {
     std::exit(0);
+}
+
+void history(const Command& /*cmd*/) {
+    HIST_ENTRY** entries = history_list();
+    if (!entries) return;
+
+    int total = history_length;
+
+    for (int i = 0; i < total; i++) {
+        std::cout << "  " << i + 1 << "  " << entries[i]->line << '\n';
+    }
 }
 
 } // namespace Commands

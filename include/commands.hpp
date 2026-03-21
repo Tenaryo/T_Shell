@@ -13,6 +13,7 @@ void pwd(const Command& cmd);
 void type(const Command& cmd);
 void exit(const Command& cmd);
 void echo(const Command& cmd);
+void history(const Command& cmd);
 
 using CmdFunction = std::function<void(const Command& cmd)>;
 
@@ -21,6 +22,7 @@ inline const std::unordered_map<std::string, CmdFunction> cmds = {
     { "pwd", pwd },
     { "type", type },
     { "echo", echo },
+    { "history", history },
     { "exit", exit },
 };
 
