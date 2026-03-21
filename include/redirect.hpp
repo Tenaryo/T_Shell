@@ -1,13 +1,13 @@
 #pragma once
-#include <types.hpp>
-#include <string>
-#include <optional>
 #include <fcntl.h>
+#include <optional>
+#include <string>
+#include <types.hpp>
 
 namespace shell {
 
 class FdRedirect {
-public:
+  public:
     FdRedirect(int target_fd, const std::string& filename, int open_flags, mode_t mode = 0644);
     ~FdRedirect();
 
@@ -19,12 +19,10 @@ public:
 
     explicit operator bool() const { return ok_; }
     bool ok() const { return ok_; }
-
-protected:
+  protected:
     FdRedirect() = default;
     void init(int target_fd, const std::string& filename, int open_flags, mode_t mode = 0644);
-
-private:
+  private:
     void release() noexcept;
     void steal_from(FdRedirect& other) noexcept;
 
@@ -34,12 +32,12 @@ private:
 };
 
 class CoutRedirect : public FdRedirect {
-public:
+  public:
     explicit CoutRedirect(const std::string& filename, RedirectOp op);
 };
 
 class CerrRedirect : public FdRedirect {
-public:
+  public:
     explicit CerrRedirect(const std::string& filename, RedirectOp op);
 };
 

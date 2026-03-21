@@ -1,8 +1,8 @@
 #pragma once
+#include <functional>
+#include <string>
 #include <types.hpp>
 #include <unordered_map>
-#include <string>
-#include <functional>
 
 namespace shell {
 
@@ -18,12 +18,12 @@ void history(const Command& cmd);
 using CmdFunction = std::function<void(const Command& cmd)>;
 
 inline const std::unordered_map<std::string, CmdFunction> cmds = {
-    { "cd", cd },
-    { "pwd", pwd },
-    { "type", type },
-    { "echo", echo },
-    { "history", history },
-    { "exit", exit },
+    {"cd", cd},
+    {"pwd", pwd},
+    {"type", type},
+    {"echo", echo},
+    {"history", history},
+    {"exit", exit},
 };
 
 } // namespace Commands

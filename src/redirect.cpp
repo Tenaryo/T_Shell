@@ -1,5 +1,5 @@
-#include <redirect.hpp>
 #include <iostream>
+#include <redirect.hpp>
 #include <unistd.h>
 
 namespace shell {
@@ -8,13 +8,9 @@ FdRedirect::FdRedirect(int target_fd, const std::string& filename, int open_flag
     init(target_fd, filename, open_flags, mode);
 }
 
-FdRedirect::~FdRedirect() {
-    release();
-}
+FdRedirect::~FdRedirect() { release(); }
 
-FdRedirect::FdRedirect(FdRedirect&& other) noexcept {
-    steal_from(other);
-}
+FdRedirect::FdRedirect(FdRedirect&& other) noexcept { steal_from(other); }
 
 FdRedirect& FdRedirect::operator=(FdRedirect&& other) noexcept {
     if (this != &other) {
@@ -24,7 +20,6 @@ FdRedirect& FdRedirect::operator=(FdRedirect&& other) noexcept {
     return *this;
 }
 
-
 void FdRedirect::init(int target_fd, const std::string& filename, int open_flags, mode_t mode) {
     target_fd_ = target_fd;
     saved_fd_ = dup(target_fd);
@@ -33,7 +28,8 @@ void FdRedirect::init(int target_fd, const std::string& filename, int open_flags
     }
 
     int fd = open(filename.c_str(), open_flags, mode);
-    if (fd < 0) return;
+    if (fd < 0)
+        return;
 
     if (dup2(fd, target_fd) < 0) {
         close(fd);
@@ -46,7 +42,8 @@ void FdRedirect::init(int target_fd, const std::string& filename, int open_flags
 }
 
 void FdRedirect::release() noexcept {
-    if (!ok_) return;
+    if (!ok_)
+        return;
 
     if (dup2(saved_fd_, target_fd_) < 0) {
         std::cerr << "Failed to restore fd\n";
@@ -66,16 +63,14 @@ void FdRedirect::steal_from(FdRedirect& other) noexcept {
 }
 
 CoutRedirect::CoutRedirect(const std::string& filename, RedirectOp op) {
-    int flags = (op == RedirectOp::Append)
-        ? (O_WRONLY | O_CREAT | O_APPEND)
-        : (O_WRONLY | O_CREAT | O_TRUNC);
+    int flags = (op == RedirectOp::Append) ? (O_WRONLY | O_CREAT | O_APPEND)
+                                           : (O_WRONLY | O_CREAT | O_TRUNC);
     init(STDOUT_FILENO, filename, flags, 0644);
 }
 
 CerrRedirect::CerrRedirect(const std::string& filename, RedirectOp op) {
-    int flags = (op == RedirectOp::Append)
-        ? (O_WRONLY | O_CREAT | O_APPEND)
-        : (O_WRONLY | O_CREAT | O_TRUNC);
+    int flags = (op == RedirectOp::Append) ? (O_WRONLY | O_CREAT | O_APPEND)
+                                           : (O_WRONLY | O_CREAT | O_TRUNC);
     init(STDERR_FILENO, filename, flags, 0644);
 }
 

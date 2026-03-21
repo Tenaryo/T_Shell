@@ -4,12 +4,11 @@
 namespace shell {
 
 class LineReader {
-public:
+  public:
     LineReader();
     void set_prompt(std::string prompt) { prompt_ = std::move(prompt); }
     std::string read_line();
-
-private:
+  private:
     std::string prompt_;
 };
 

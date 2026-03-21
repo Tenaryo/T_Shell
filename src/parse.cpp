@@ -1,5 +1,5 @@
-#include <parse.hpp>
 #include <iostream>
+#include <parse.hpp>
 
 namespace shell {
 
@@ -17,13 +17,13 @@ static std::optional<Redirect> parse_redirect(const std::vector<Token>& tokens, 
     const auto& target = tokens[++i].value;
 
     if (op == "1>" || op == ">") {
-        return Redirect{ 1, target, RedirectOp::Replace };
+        return Redirect{1, target, RedirectOp::Replace};
     } else if (op == "2>") {
-        return Redirect{ 2, target, RedirectOp::Replace };
+        return Redirect{2, target, RedirectOp::Replace};
     } else if (op == "1>>" || op == ">>") {
-        return Redirect{ 1, target, RedirectOp::Append };
+        return Redirect{1, target, RedirectOp::Append};
     } else if (op == "2>>") {
-        return Redirect{ 2, target, RedirectOp::Append };
+        return Redirect{2, target, RedirectOp::Append};
     }
     return std::nullopt;
 }

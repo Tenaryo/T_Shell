@@ -1,5 +1,5 @@
-#include <lexer.hpp>
 #include <iostream>
+#include <lexer.hpp>
 
 namespace shell {
 
@@ -24,12 +24,17 @@ std::vector<Token> lexer(const std::string& s) {
             is_in_double_quote = !is_in_double_quote;
         } else if (c == '\\') {
             if (!is_in_single_quote && !is_in_double_quote) {
-                if (i == s.size() - 1) cur += s[i];
-                else cur += s[++i];
+                if (i == s.size() - 1)
+                    cur += s[i];
+                else
+                    cur += s[++i];
             } else if (is_in_double_quote) {
-                if (i == s.size() - 1) std::cerr << "unclosed double quote\n";
-                else if (s[i + 1] == '\\' || s[i + 1] == '\"') cur += s[++i];
-            } else cur += c;
+                if (i == s.size() - 1)
+                    std::cerr << "unclosed double quote\n";
+                else if (s[i + 1] == '\\' || s[i + 1] == '\"')
+                    cur += s[++i];
+            } else
+                cur += c;
         } else if (c == '|' && !is_in_double_quote && !is_in_single_quote) {
             if (!cur.empty()) {
                 ret.emplace_back(TokenType::Word, cur);
@@ -42,7 +47,8 @@ std::vector<Token> lexer(const std::string& s) {
                 fd += cur.back();
                 cur.pop_back();
             }
-            if (!cur.empty()) ret.emplace_back(TokenType::Word, cur);
+            if (!cur.empty())
+                ret.emplace_back(TokenType::Word, cur);
             if (i + 1 < s.size() && s[i + 1] == '>') {
                 ret.emplace_back(TokenType::Redirect, fd + ">>");
                 i++;
@@ -54,8 +60,9 @@ std::vector<Token> lexer(const std::string& s) {
             cur += c;
         }
     }
-    if (!cur.empty()) ret.emplace_back(TokenType::Word, cur);
+    if (!cur.empty())
+        ret.emplace_back(TokenType::Word, cur);
     return ret;
 }
 
-}
+} // namespace shell

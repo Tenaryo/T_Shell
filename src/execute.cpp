@@ -1,14 +1,14 @@
-#include <execute.hpp>
-#include <redirect.hpp>
-#include <types.hpp>
 #include <commands.hpp>
 #include <executable_cache.hpp>
-#include <iostream>
-#include <filesystem>
-#include <sys/wait.h>
-#include <sys/stat.h>
-#include <unistd.h>
+#include <execute.hpp>
 #include <fcntl.h>
+#include <filesystem>
+#include <iostream>
+#include <redirect.hpp>
+#include <sys/stat.h>
+#include <sys/wait.h>
+#include <types.hpp>
+#include <unistd.h>
 
 namespace shell {
 
@@ -23,10 +23,12 @@ static std::vector<char*> build_argv(const Command& cmd) {
 }
 
 static void apply_redirect(const Command& cmd) {
-    if (!cmd.redirect) return;
+    if (!cmd.redirect)
+        return;
     auto& rd = cmd.redirect.value();
 
-    int flags = (rd.op == RedirectOp::Append) ? (O_WRONLY | O_CREAT | O_APPEND) : (O_WRONLY | O_CREAT | O_TRUNC);
+    int flags = (rd.op == RedirectOp::Append) ? (O_WRONLY | O_CREAT | O_APPEND)
+                                              : (O_WRONLY | O_CREAT | O_TRUNC);
     int fd = open(rd.target.c_str(), flags, 0644);
     if (fd < 0) {
         std::cerr << "Failed to redirect\n";
@@ -43,24 +45,24 @@ static void exec_single(const Command& cmd) {
         if (cmd.redirect) {
             auto& rd = cmd.redirect.value();
             switch (rd.fd) {
-                case 1: {
-                    CoutRedirect r(rd.target, rd.op);
-                    if (!r) {
-                        std::cerr << "Failed to redirect\n";
-                        return;
-                    }
-                    it->second(cmd);
-                    break;
+            case 1: {
+                CoutRedirect r(rd.target, rd.op);
+                if (!r) {
+                    std::cerr << "Failed to redirect\n";
+                    return;
                 }
-                case 2: {
-                    CerrRedirect r(rd.target, rd.op);
-                    if (!r) {
-                        std::cerr << "Failed to redirect\n";
-                        return;
-                    }
-                    it->second(cmd);
-                    break;
+                it->second(cmd);
+                break;
+            }
+            case 2: {
+                CerrRedirect r(rd.target, rd.op);
+                if (!r) {
+                    std::cerr << "Failed to redirect\n";
+                    return;
                 }
+                it->second(cmd);
+                break;
+            }
             }
         } else {
             it->second(cmd);
@@ -153,7 +155,8 @@ static void exec_pipeline(const Pipeline& pipeline) {
 }
 
 void execute(const Pipeline& pipeline) {
-    if (pipeline.empty()) return;
+    if (pipeline.empty())
+        return;
 
     if (pipeline.size() == 1) {
         exec_single(pipeline[0]);

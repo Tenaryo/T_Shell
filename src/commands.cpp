@@ -1,6 +1,6 @@
 #include <commands.hpp>
-#include <execute.hpp>
 #include <executable_cache.hpp>
+#include <execute.hpp>
 #include <filesystem>
 #include <iostream>
 #include <readline/history.h>
@@ -16,8 +16,10 @@ void cd(const Command& cmd) {
     }
 
     std::string dir;
-    if (cmd.args.empty()) dir = "~";
-    else dir = cmd.args[0];
+    if (cmd.args.empty())
+        dir = "~";
+    else
+        dir = cmd.args[0];
 
     if (dir[0] == '~') {
         const char* home = getenv("HOME");
@@ -60,7 +62,8 @@ void type(const Command& cmd) {
 }
 
 void echo(const Command& cmd) {
-    if (cmd.args.empty()) return;
+    if (cmd.args.empty())
+        return;
     std::cout << cmd.args[0];
     for (size_t i = 1; i < cmd.args.size(); i++) {
         std::cout << ' ' << cmd.args[i];
@@ -68,13 +71,12 @@ void echo(const Command& cmd) {
     std::cout << '\n';
 }
 
-void exit(const Command& /*cmd*/) {
-    std::exit(0);
-}
+void exit(const Command& /*cmd*/) { std::exit(0); }
 
 void history(const Command& cmd) {
     HIST_ENTRY** entries = history_list();
-    if (!entries) return;
+    if (!entries)
+        return;
 
     int total = history_length;
     int count = total;
@@ -82,7 +84,8 @@ void history(const Command& cmd) {
     if (!cmd.args.empty()) {
         try {
             count = std::stoi(cmd.args[0]);
-            if (count <= 0) return;
+            if (count <= 0)
+                return;
         } catch (...) {
             std::cerr << "history: " << cmd.args[0] << ": invalid number\n";
             return;

@@ -1,9 +1,9 @@
+#include <algorithm>
 #include <executable_cache.hpp>
 #include <filesystem>
-#include <sstream>
 #include <ranges>
+#include <sstream>
 #include <unistd.h>
-#include <algorithm>
 #include <unordered_map>
 
 namespace shell {
@@ -15,7 +15,8 @@ void ExecutableCache::scan_path() {
     std::unordered_map<std::string, std::string> tmp;
 
     const char* cpath = getenv("PATH");
-    if (!cpath) return;
+    if (!cpath)
+        return;
 
     std::stringstream ss(cpath);
     std::string dir;
@@ -23,15 +24,18 @@ void ExecutableCache::scan_path() {
     while (std::getline(ss, dir, ':')) {
         try {
             for (const auto& entry : std::filesystem::directory_iterator(dir)) {
-                if (!entry.is_regular_file()) continue;
-                if (access(entry.path().c_str(), X_OK) != 0) continue;
+                if (!entry.is_regular_file())
+                    continue;
+                if (access(entry.path().c_str(), X_OK) != 0)
+                    continue;
 
                 std::string name = entry.path().filename().string();
                 if (!tmp.contains(name)) {
                     tmp.emplace(std::move(name), entry.path().string());
                 }
             }
-        } catch (...) {}
+        } catch (...) {
+        }
     }
 
     names_.reserve(tmp.size());
@@ -42,10 +46,9 @@ void ExecutableCache::scan_path() {
     }
 
     std::vector<size_t> idx(names_.size());
-    for (size_t i = 0; i < idx.size(); ++i) idx[i] = i;
-    std::ranges::sort(idx, [&](size_t a, size_t b) {
-        return names_[a] < names_[b];
-    });
+    for (size_t i = 0; i < idx.size(); ++i)
+        idx[i] = i;
+    std::ranges::sort(idx, [&](size_t a, size_t b) { return names_[a] < names_[b]; });
 
     std::vector<std::string> sorted_names(names_.size());
     std::vector<std::string> sorted_paths(paths_.size());
@@ -70,8 +73,6 @@ std::optional<std::string> ExecutableCache::get_path(const std::string& name) co
     return std::nullopt;
 }
 
-void ExecutableCache::refresh() {
-    scan_path();
-}
+void ExecutableCache::refresh() { scan_path(); }
 
 } // namespace shell

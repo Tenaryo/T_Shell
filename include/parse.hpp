@@ -1,7 +1,7 @@
 #pragma once
+#include <optional>
 #include <types.hpp>
 #include <vector>
-#include <optional>
 
 namespace shell {
 

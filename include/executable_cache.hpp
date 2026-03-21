@@ -1,12 +1,12 @@
 #pragma once
-#include <string>
 #include <optional>
+#include <string>
 #include <vector>
 
 namespace shell {
 
 class ExecutableCache {
-public:
+  public:
     static ExecutableCache& instance() {
         static ExecutableCache cache;
         return cache;
@@ -16,8 +16,7 @@ public:
     std::optional<std::string> get_path(const std::string& name) const;
     const std::vector<std::string>& names() const { return names_; }
     void refresh();
-
-private:
+  private:
     ExecutableCache() { scan_path(); }
     void scan_path();
 
