@@ -36,3 +36,6 @@ Thumbs.db
 
 # vcpkg
 vcpkg_installed/
+
+# Agent
+AGENTS.md
