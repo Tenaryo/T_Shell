@@ -1,4 +1,4 @@
-# T Shell - A Modern C++ Shell
+# TSH - A Modern C++ Shell
 
 A lightweight POSIX-compliant shell implementation for practice in modern C++.
 
